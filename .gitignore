@@ -1,0 +1,7 @@
+.idea/
+target/
+gen/
+project/project
+bin/
+local.properties
+*~

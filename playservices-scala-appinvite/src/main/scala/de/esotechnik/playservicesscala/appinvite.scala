@@ -1,11 +1,12 @@
 package de.esotechnik.playservicesscala
 
+import com.google.android.gms.appinvite.AppInviteApi
 import com.google.android.gms.{appinvite => gms}
-import de.esotechnik.playservicesscala.ApiLoader.loadApi
+import de.esotechnik.playservicesscala.macros.loadApi
 
 package object appinvite {
 
-  val AppInvite = loadApi(gms.AppInvite.AppInviteApi)
+  @loadApi(gms.AppInvite.AppInviteApi) object AppInvite {}
 
   trait PlayServicesAppInvite { self : PlayServices =>
     self.addApi(gms.AppInvite.API)

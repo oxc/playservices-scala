@@ -3,11 +3,11 @@ package de.esotechnik.playservicesscala
 import com.google.android.gms.auth.api.Auth
 import com.google.android.gms.auth.api.Auth.AuthCredentialsOptions
 import com.google.android.gms.auth.{api => gms}
-import de.esotechnik.playservicesscala.ApiLoader.loadApi
+import de.esotechnik.playservicesscala.macros.loadApi
 
 package object auth {
   
-  val Credentials = loadApi(Auth.CredentialsApi)
+  @loadApi(Auth.CredentialsApi) object Credentials {}
 
   trait PlayServicesAuthCred { self : PlayServices =>
     authCredientialsOptions match {

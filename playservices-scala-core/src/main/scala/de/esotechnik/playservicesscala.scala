@@ -1,6 +1,7 @@
 package de.esotechnik
 
 import android.app.Activity
+import android.util.Log
 import com.google.android.gms.common.api.Api.ApiOptions.{HasOptions, NotRequiredOptions}
 import com.google.android.gms.common.api.GoogleApiClient.{Builder => ClientBuilder, ConnectionCallbacks, OnConnectionFailedListener}
 import com.google.android.gms.common.api.{Api => PlayApi, GoogleApiClient}
@@ -11,6 +12,8 @@ package object playservicesscala {
 
   trait PlayServices extends Activity with ConnectionCallbacks with OnConnectionFailedListener {
     this: Activity =>
+
+    private val TAG = "PlayServicesScala"
 
     private val playServiceAPIs: mutable.MutableList[ApiDependency] = mutable.MutableList()
 
@@ -32,27 +35,32 @@ package object playservicesscala {
       assert(playServiceAPIs.nonEmpty, "No APIs added to PlayServices. Call addApi() before onStart() is called.")
       playServiceAPIs.foreach { _.addApi(builder) }
 
+      Log.d(TAG, "Building GoogleApiClient...")
+
       return builder.build()
     }
 
     override def onStart(): Unit = {
       super.onStart()
+      Log.d(TAG, "Connecting GoogleApiClient...")
       googleApiClient.connect()
     }
 
     override def onStop() : Unit = {
+      super.onStop()
+      Log.d(TAG, "Disconnecting GoogleApiClient...")
       googleApiClient.disconnect()
     }
 
   }
 
-  private[playservicesscala] sealed trait ApiDependency {
+  private[esotechnik] sealed trait ApiDependency {
     def addApi(builder : ClientBuilder) : Unit
   }
-  private[playservicesscala] case class ApiWithOptions[O <: HasOptions](api : PlayApi[O], options : O) extends ApiDependency {
+  private[esotechnik] case class ApiWithOptions[O <: HasOptions](api : PlayApi[O], options : O) extends ApiDependency {
     override def addApi(builder : ClientBuilder) = builder.addApi(api, options)
   }
-  private[playservicesscala] case class ApiNoOptions[O <: NotRequiredOptions](api : PlayApi[O]) extends ApiDependency {
+  private[esotechnik] case class ApiNoOptions[O <: NotRequiredOptions](api : PlayApi[O]) extends ApiDependency {
     override def addApi(builder: ClientBuilder) = builder.addApi(api)
   }
 

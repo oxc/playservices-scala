@@ -1,16 +1,16 @@
 package de.esotechnik.playservicesscala
 
 import com.google.android.gms.fitness.Fitness
-import de.esotechnik.playservicesscala.ApiLoader.loadApi
+import de.esotechnik.playservicesscala.macros.loadApi
 
 package object fitness {
 
-  val Sensors = loadApi(Fitness.SensorsApi)
-  val Recording = loadApi(Fitness.RecordingApi)
-  val Sessions = loadApi(Fitness.SessionsApi)
-  val History = loadApi(Fitness.HistoryApi)
-  val Ble = loadApi(Fitness.BleApi)
-  val Config = loadApi(Fitness.ConfigApi)
+  @loadApi(Fitness.SensorsApi) object Sensors {}
+  @loadApi(Fitness.RecordingApi) object Recording {}
+  @loadApi(Fitness.SessionsApi) object Sessions {}
+  @loadApi(Fitness.HistoryApi) object History {}
+  @loadApi(Fitness.BleApi) object Ble {}
+  @loadApi(Fitness.ConfigApi) object Config {}
 
   trait PlayServicesFitnessSensors { self : PlayServices =>
     self.addApi(Fitness.SENSORS_API)

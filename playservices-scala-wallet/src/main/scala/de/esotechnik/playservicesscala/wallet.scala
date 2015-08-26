@@ -2,11 +2,11 @@ package de.esotechnik.playservicesscala
 
 import com.google.android.gms.wallet.Wallet
 import com.google.android.gms.wallet.Wallet.WalletOptions
-import de.esotechnik.playservicesscala.ApiLoader.loadApi
+import de.esotechnik.playservicesscala.macros.loadApi
 
 package object wallet {
 
-  val Payments = loadApi(Wallet.Payments)
+  @loadApi(Wallet.Payments) object Payments {}
 
   trait PlayServicesWallet { self : PlayServices =>
     self.addApi(Wallet.API, walletOptions)

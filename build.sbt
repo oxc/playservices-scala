@@ -12,12 +12,7 @@ organizationHomepage in ThisBuild := None
 
 version in ThisBuild := libraryVersion.value + "-gms_" + playServicesVersion.value + (if (isSnapshot.value) "-SNAPSHOT")
 
-lazy val commonSettings = Seq()
-
-lazy val commonProjectSettings = android.Plugin.androidBuildJar ++ commonSettings
-
 lazy val root = (project in file(".")).
-  settings(commonSettings: _*).
   settings(
     name := "playservices-scala",
     artifacts := Seq()
@@ -25,12 +20,12 @@ lazy val root = (project in file(".")).
   aggregate(allModules.map(p => p : ProjectReference): _*).
   dependsOn(allModules.map(p => p : ClasspathDep[ProjectReference]): _*)
 
-def asCoreProject(project : Project) = {
+def commonSettings(project : Project) = {
   val prefix = "playservices-scala-"
   val module = project.id
 
   (project in file(prefix + module)).
-    settings(commonProjectSettings: _*).
+    settings(android.Plugin.androidBuildJar).
     settings(
       name := prefix + module,
 
@@ -43,13 +38,16 @@ def asCoreProject(project : Project) = {
       libraryDependencies ++= Seq(
         "org.scala-lang" % "scala-reflect" % scalaVersion.value,
         "com.google.android.gms" % s"play-services-base" % playServicesVersion.value
-      )
+      ),
+
+      addCompilerPlugin("org.scalamacros" % "paradise" % "2.1.0-M5" cross CrossVersion.full)
     )
 }
+
 def asSubProject(project : Project) = {
   val module = project.id
 
-  asCoreProject(project).
+  project.configure(commonSettings).
     dependsOn(core).
     settings(
       libraryDependencies ++= Seq(
@@ -58,7 +56,9 @@ def asSubProject(project : Project) = {
     )
 }
 
-lazy val core = project configure asCoreProject
+lazy val core = (project configure commonSettings).
+  settings(
+  )
 
 lazy val allModules = Seq(core, plus, identity, base, appindexing, appinvite, analytics, cast, gcm,
   drive, fitness, location, maps, ads, vision, nearby, panorama, games, safetynet, wallet, wearable)

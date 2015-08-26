@@ -2,12 +2,12 @@ package de.esotechnik.playservicesscala
 
 import com.google.android.gms.nearby.Nearby
 import com.google.android.gms.nearby.messages.MessagesOptions
-import de.esotechnik.playservicesscala.ApiLoader.loadApi
+import de.esotechnik.playservicesscala.macros.loadApi
 
 package object nearby {
 
-  val Connections = loadApi(Nearby.Connections)
-  val Messages = loadApi(Nearby.Messages)
+  @loadApi(Nearby.Connections) object Connections {}
+  @loadApi(Nearby.Messages) object Messages {}
 
   trait PlayServicesNearbyConnections { self : PlayServices =>
     self.addApi(Nearby.CONNECTIONS_API)

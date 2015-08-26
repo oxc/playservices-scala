@@ -2,15 +2,15 @@ package de.esotechnik.playservicesscala
 
 import com.google.android.gms.wearable.Wearable
 import com.google.android.gms.wearable.Wearable.WearableOptions
-import de.esotechnik.playservicesscala.ApiLoader.loadApi
+import de.esotechnik.playservicesscala.macros.loadApi
 
 package object wearable {
 
-  val Capability = loadApi(Wearable.CapabilityApi)
-  val Channel = loadApi(Wearable.ChannelApi)
-  val Data = loadApi(Wearable.DataApi)
-  val Message = loadApi(Wearable.MessageApi)
-  val Node = loadApi(Wearable.NodeApi)
+  @loadApi(Wearable.CapabilityApi) object Capability {}
+  @loadApi(Wearable.ChannelApi) object Channel {}
+  @loadApi(Wearable.DataApi) object Data {}
+  @loadApi(Wearable.MessageApi) object Message {}
+  @loadApi(Wearable.NodeApi) object Node {}
   
   trait PlayServicesWearable { self : PlayServices =>
     wearableOptions match {

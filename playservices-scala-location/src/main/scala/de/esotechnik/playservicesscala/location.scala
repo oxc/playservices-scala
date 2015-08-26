@@ -1,13 +1,13 @@
 package de.esotechnik.playservicesscala
 
 import com.google.android.gms.location.LocationServices
-import de.esotechnik.playservicesscala.ApiLoader.loadApi
+import de.esotechnik.playservicesscala.macros.loadApi
 
 package object location {
 
-  val FusedLocationProvider = loadApi(LocationServices.FusedLocationApi)
-  val Geofencing = loadApi(LocationServices.GeofencingApi)
-  val Settings = loadApi(LocationServices.SettingsApi)
+  @loadApi(LocationServices.FusedLocationApi) object FusedLocationProvider {}
+  @loadApi(LocationServices.GeofencingApi) object Geofencing {}
+  @loadApi(LocationServices.SettingsApi) object Settings {}
 
   trait PlayServicesLocation { self : PlayServices =>
     self.addApi(LocationServices.API)

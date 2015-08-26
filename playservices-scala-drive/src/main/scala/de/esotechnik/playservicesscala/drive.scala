@@ -1,12 +1,12 @@
 package de.esotechnik.playservicesscala
 
 import com.google.android.gms.{drive => gms}
-import de.esotechnik.playservicesscala.ApiLoader.loadApi
+import de.esotechnik.playservicesscala.macros.loadApi
 
 package object drive {
 
-  val Drive = loadApi(gms.Drive.DriveApi)
-  val DrivePreferences = loadApi(gms.Drive.DrivePreferencesApi)
+  @loadApi(gms.Drive.DriveApi) object Drive {}
+  @loadApi(gms.Drive.DrivePreferencesApi) object DrivePreferences {}
 
   trait PlayServicesDrive { self : PlayServices =>
     self.addApi(gms.Drive.API)

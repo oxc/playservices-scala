@@ -5,7 +5,7 @@ import android.view.View
 import com.google.android.gms.common.api.{GoogleApiClient, Status}
 import com.google.android.gms.games.Games.GamesOptions
 import com.google.android.gms.{games => gms}
-import de.esotechnik.playservicesscala.ApiLoader.loadApi
+import de.esotechnik.playservicesscala.macros.loadApi
 
 import scala.concurrent.Future
 
@@ -21,18 +21,18 @@ package object games {
     def signOut()(implicit apiClient : GoogleApiClient) : Future[Status] = gms.Games.signOut(apiClient)
   }
 
-  val Achievements = loadApi(gms.Games.Achievements)
-  val Events = loadApi(gms.Games.Events)
-  val GamesMetadata = loadApi(gms.Games.GamesMetadata)
-  val Invitations = loadApi(gms.Games.Invitations)
-  val Leaderboards = loadApi(gms.Games.Leaderboards)
-  val Notifications = loadApi(gms.Games.Notifications)
-  val Players = loadApi(gms.Games.Players)
-  val Quests = loadApi(gms.Games.Quests)
-  val RealTimeMultiplayer = loadApi(gms.Games.RealTimeMultiplayer)
-  val Requests = loadApi(gms.Games.Requests)
-  val Snapshots = loadApi(gms.Games.Snapshots)
-  val TurnBasedMultiplayer = loadApi(gms.Games.TurnBasedMultiplayer)
+  @loadApi(gms.Games.Achievements) object Achievements {}
+  @loadApi(gms.Games.Events) object Events {}
+  @loadApi(gms.Games.GamesMetadata) object GamesMetadata {}
+  @loadApi(gms.Games.Invitations) object Invitations {}
+  @loadApi(gms.Games.Leaderboards) object Leaderboards {}
+  @loadApi(gms.Games.Notifications) object Notifications {}
+  @loadApi(gms.Games.Players) object Players {}
+  @loadApi(gms.Games.Quests) object Quests {}
+  @loadApi(gms.Games.RealTimeMultiplayer) object RealTimeMultiplayer {}
+  @loadApi(gms.Games.Requests) object Requests {}
+  @loadApi(gms.Games.Snapshots) object Snapshots {}
+  @loadApi(gms.Games.TurnBasedMultiplayer) object TurnBasedMultiplayer {}
 
   trait PlayServicesGames { self : PlayServices =>
     gamesOptions match {

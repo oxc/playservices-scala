@@ -32,7 +32,7 @@ package object playservicesscala {
         .addConnectionCallbacks(this)
         .addOnConnectionFailedListener(this)
 
-      assert(playServiceAPIs.nonEmpty, "No APIs added to PlayServices. Call addApi() before onStart() is called.")
+      require(playServiceAPIs.nonEmpty, "No APIs added to PlayServices. Call addApi() before onStart() is called.")
       playServiceAPIs.foreach { _.addApi(builder) }
 
       Log.d(TAG, "Building GoogleApiClient...")

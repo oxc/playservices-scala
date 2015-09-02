@@ -21,12 +21,6 @@ import de.esotechnik.playservicesscala.macros.loadApi
 
 package object appinvite {
 
-  @loadApi(gms.AppInvite.AppInviteApi) object AppInvite {}
-
-  trait PlayServicesAppInvite { self : PlayServices =>
-    self.addApi(gms.AppInvite.API)
-
-    protected val appInvite = AppInvite
-  }
+  @loadApi(gms.AppInvite.AppInviteApi, gms.AppInvite.API) object AppInvite {}
 
 }

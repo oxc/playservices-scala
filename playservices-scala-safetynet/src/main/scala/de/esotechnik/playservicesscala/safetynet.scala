@@ -20,12 +20,6 @@ import de.esotechnik.playservicesscala.macros.loadApi
 
 package object safetynet {
 
-  @loadApi(gms.SafetyNet.SafetyNetApi) object SafetyNet {}
-
-  trait PlayServicesSafetyNet { self : PlayServices =>
-    self.addApi(gms.SafetyNet.API)
-
-    protected val safetyNet = SafetyNet
-  }
+  @loadApi(gms.SafetyNet.SafetyNetApi, gms.SafetyNet.API) object SafetyNet {}
 
 }

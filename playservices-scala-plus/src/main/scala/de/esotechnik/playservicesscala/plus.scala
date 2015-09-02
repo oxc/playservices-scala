@@ -21,21 +21,8 @@ import de.esotechnik.playservicesscala.macros.loadApi
 
 package object plus {
 
-  @loadApi(Plus.AccountApi) object Account {}
-  @loadApi(Plus.MomentsApi) object Moments {}
-  @loadApi(Plus.PeopleApi) object People {}
-
-  trait PlayServicesPlus { self : PlayServices =>
-    plusOptions match {
-      case Some(options) => self.addApi(Plus.API, options)
-      case None => self.addApi(Plus.API)
-    }
-
-    protected val plusOptions : Option[PlusOptions] = None
-
-    protected val account = Account
-    protected val moment = Moments
-    protected val people = People
-  }
+  @loadApi(Plus.AccountApi, Plus.API) object Account {}
+  @loadApi(Plus.MomentsApi, Plus.API) object Moments {}
+  @loadApi(Plus.PeopleApi, Plus.API) object People {}
 
 }

@@ -17,6 +17,7 @@ package de.esotechnik
 
 import android.app.Activity
 import android.util.Log
+import com.google.android.gms.common.ConnectionResult
 import com.google.android.gms.common.api.Api.ApiOptions.{HasOptions, NotRequiredOptions}
 import com.google.android.gms.common.api.GoogleApiClient.{Builder => ClientBuilder, ConnectionCallbacks, OnConnectionFailedListener}
 import com.google.android.gms.common.api.{Api => PlayApi, GoogleApiClient}
@@ -30,15 +31,7 @@ package object playservicesscala {
 
     private val TAG = "PlayServicesScala"
 
-    private val playServiceAPIs: mutable.MutableList[ApiDependency] = mutable.MutableList()
-
-    protected final def addApi[O <: HasOptions](api : PlayApi[O], options : O): Unit = {
-      playServiceAPIs += ApiWithOptions(api, options)
-    }
-
-    protected final def addApi[O <: NotRequiredOptions](api : PlayApi[O]) : Unit = {
-      playServiceAPIs += ApiNoOptions(api)
-    }
+    protected val apis = new DeclaredApis()
 
     lazy implicit protected val googleApiClient : GoogleApiClient = buildGoogleApiClient()
 
@@ -47,8 +40,8 @@ package object playservicesscala {
         .addConnectionCallbacks(this)
         .addOnConnectionFailedListener(this)
 
-      require(playServiceAPIs.nonEmpty, "No APIs added to PlayServices. Call addApi() before onStart() is called.")
-      playServiceAPIs.foreach { _.addApi(builder) }
+      require(apis.apis.nonEmpty, "No APIs added to PlayServices. Add some to `apis` before onStart() is called.")
+      apis.apis.foreach { _.addApi(builder) }
 
       Log.d(TAG, "Building GoogleApiClient...")
 
@@ -67,16 +60,59 @@ package object playservicesscala {
       googleApiClient.disconnect()
     }
 
+
+    val connectionFailedResolutionResultCode: Int = 1001
+
+    override def onConnectionFailed(connectionResult : ConnectionResult) {
+      if (connectionResult.hasResolution) {
+        connectionResult.startResolutionForResult(this, connectionFailedResolutionResultCode)
+      }
+    }
   }
 
-  private[esotechnik] sealed trait ApiDependency {
-    def addApi(builder : ClientBuilder) : Unit
+  class DeclaredApis {
+    private[playservicesscala] val apis : mutable.HashSet[ApiDependency] = mutable.HashSet()
+
+    def ++=(xs : TraversableOnce[ApiDependency]) = apis ++= xs
+
+    def +=(apiDependency: ApiDependency) = apis += apiDependency
+
+    def ?=(apiDependency: ApiDependency) = apis += apiDependency.ifAvailable
   }
-  private[esotechnik] case class ApiWithOptions[O <: HasOptions](api : PlayApi[O], options : O) extends ApiDependency {
-    override def addApi(builder : ClientBuilder) = builder.addApi(api, options)
+
+  sealed trait ApiDependency {
+    private[playservicesscala] def addApi(builder : ClientBuilder) : Unit
+
+    private[playservicesscala] def addApiIfAvailable(builder : ClientBuilder) : Unit
+
+    def ifAvailable : ApiDependency = new OptionalApiDependency(this)
   }
-  private[esotechnik] case class ApiNoOptions[O <: NotRequiredOptions](api : PlayApi[O]) extends ApiDependency {
-    override def addApi(builder: ClientBuilder) = builder.addApi(api)
+  implicit final class ApiNoOptions[O <: NotRequiredOptions](val api : PlayApi[O]) extends ApiDependency {
+    override private[playservicesscala] def addApi(builder: ClientBuilder) = builder.addApi(api)
+
+    override private[playservicesscala] def addApiIfAvailable(builder: ClientBuilder) = builder.addApiIfAvailable(api)
+  }
+  final class ApiWithOptions[O <: HasOptions](api : PlayApi[O], options : => O) extends ApiDependency {
+    override private[playservicesscala] def addApi(builder : ClientBuilder) = builder.addApi(api, options)
+
+    override private[playservicesscala] def addApiIfAvailable(builder: ClientBuilder) = builder.addApiIfAvailable(api, options)
+  }
+
+  implicit final class RichApi[O <: HasOptions](val api: PlayApi[O]) extends AnyVal {
+    def withOptions(options: => O) = new ApiWithOptions(api, options)
+
+    def %(options: => O) = withOptions(options)
+  }
+
+  implicit def wrapperToDependency[O <: NotRequiredOptions](apiWrapper: ApiWrapper[PlayApi[O]]) = ApiNoOptions(apiWrapper.requiredApi)
+  implicit def wrapperToRichApi[O <: HasOptions](apiWrapper : ApiWrapper[PlayApi[O]]) = RichApi(apiWrapper.requiredApi)
+
+  final class OptionalApiDependency(apiDependency: ApiDependency) extends ApiDependency {
+    override private[playservicesscala] def addApi(builder: ClientBuilder): Unit = apiDependency.addApiIfAvailable(builder)
+
+    override private[playservicesscala] def addApiIfAvailable(builder: ClientBuilder): Unit = apiDependency.addApiIfAvailable(builder)
+
+    override def ifAvailable = this
   }
 
 }

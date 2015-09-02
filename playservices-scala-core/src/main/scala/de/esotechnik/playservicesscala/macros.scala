@@ -15,8 +15,9 @@
 
 package de.esotechnik.playservicesscala
 
-import com.google.android.gms.common.api.{GoogleApiClient, PendingResult, Result, ResultCallback}
+import com.google.android.gms.common.api._
 
+import scala.annotation.implicitNotFound
 import scala.collection.mutable
 import scala.concurrent.{Future, Promise}
 
@@ -27,7 +28,7 @@ package object macros {
   import scala.language.experimental.macros
 
   @compileTimeOnly("@playApi requires macro paradise")
-  class loadApi(api: Any) extends StaticAnnotation {
+  class loadApi(api: Any, requiredApi: Api[_]) extends StaticAnnotation {
     def macroTransform(annottees: Any*) = macro ApiLoaderMacros.loadApi
   }
 
@@ -38,10 +39,11 @@ package object macros {
     def bail(message: String) = c.abort(c.enclosingPosition, message)
 
     def loadApi(annottees: c.Expr[Any]*) = {
-      val apiTree = c.macroApplication match {
-        case Apply(Select(q"new loadApi($aTree)", _), _) => aTree : Tree
+      val (apiTree, requiredApiTree) = c.macroApplication match {
+        case Apply(Select(q"new loadApi($aTree, $rTree)", _), _) => (aTree : Tree, rTree : Tree)
       }
       val api = c.Expr(c.typecheck(apiTree))
+      val requiredApi = c.Expr(c.typecheck(requiredApiTree))
 
       annottees.map(_.tree) match {
         case List(q"object $name extends $parent { ..$body }") => {
@@ -81,7 +83,9 @@ package object macros {
           }
 
           val result = q"""
-              object $name extends $parent with ApiWrapper {
+              object $name extends $parent with ApiWrapper[${requiredApi.actualType}] {
+                val requiredApi = $requiredApiTree
+
                 ..$body
                 ..$defs
               }
@@ -103,13 +107,16 @@ package object macros {
         } else {
           var t = param.typeSignature.dealias.toString
           // get simpleName
-          val pos = t.lastIndexOf('.')
-          if (pos >= 0) {
-            t = t.substring(pos + 1)
-          }
+          t = t.replaceAll("[^\\[]+\\.", "")
           t = t(0).toLower + t.substring(1)
           // Int* -> ints
-          t.replace('*', 's')
+          t = t.replace('*', 's')
+          // List[String] -> listOfString
+          t = t.replace("[", "Of")
+          t = t.replace("]", "")
+          // Map[Int,String] -> mapOfIntAndString
+          t = t.replace(",", "And")
+          t
         }
       }
 
@@ -155,7 +162,24 @@ package object macros {
   }
 }
 
-trait ApiWrapper {
+trait ApiWrapper[A <: Api[_]] {
+
+  val requiredApi : A
+
+  def apply[R](body : this.type => R)(implicit googleApiClient: GoogleApiClient) : Option[R] = {
+    (this ifAvailable) map body
+  }
+
+  def ifAvailable(implicit googleApiClient: GoogleApiClient): Option[this.type] = {
+    if (googleApiClient.hasConnectedApi(requiredApi)) {
+      Some(this)
+    } else {
+      None
+    }
+  }
+
+  def ?(implicit googleApiClient: GoogleApiClient) = ifAvailable
+
   /**
    * Converts a PendingResult to a scala Future. This is protected on purpose, since the caller
    * must ensure that only ever on such Future is created per PendingResult instance, and the

@@ -20,12 +20,6 @@ import de.esotechnik.playservicesscala.macros.loadApi
 
 package object panorama {
 
-  @loadApi(gms.Panorama.PanoramaApi) object Panorama {}
-
-  trait PlayServicesPanorama { self : PlayServices =>
-    self.addApi(gms.Panorama.API)
-
-    protected val panorama = Panorama
-  }
+  @loadApi(gms.Panorama.PanoramaApi, gms.Panorama.API) object Panorama {}
 
 }

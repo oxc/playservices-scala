@@ -20,16 +20,8 @@ import de.esotechnik.playservicesscala.macros.loadApi
 
 package object location {
 
-  @loadApi(LocationServices.FusedLocationApi) object FusedLocationProvider {}
-  @loadApi(LocationServices.GeofencingApi) object Geofencing {}
-  @loadApi(LocationServices.SettingsApi) object Settings {}
-
-  trait PlayServicesLocation { self : PlayServices =>
-    self.addApi(LocationServices.API)
-
-    protected val fusedLocationProvider = FusedLocationProvider
-    protected val geofencing = Geofencing
-    protected val locationSettings = Settings
-  }
+  @loadApi(LocationServices.FusedLocationApi, LocationServices.API) object FusedLocationProvider {}
+  @loadApi(LocationServices.GeofencingApi, LocationServices.API) object Geofencing {}
+  @loadApi(LocationServices.SettingsApi, LocationServices.API) object Settings {}
 
 }

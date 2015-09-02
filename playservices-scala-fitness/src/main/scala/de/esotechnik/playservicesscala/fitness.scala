@@ -20,60 +20,11 @@ import de.esotechnik.playservicesscala.macros.loadApi
 
 package object fitness {
 
-  @loadApi(Fitness.SensorsApi) object Sensors {}
-  @loadApi(Fitness.RecordingApi) object Recording {}
-  @loadApi(Fitness.SessionsApi) object Sessions {}
-  @loadApi(Fitness.HistoryApi) object History {}
-  @loadApi(Fitness.BleApi) object Ble {}
-  @loadApi(Fitness.ConfigApi) object Config {}
-
-  trait PlayServicesFitnessSensors { self : PlayServices =>
-    self.addApi(Fitness.SENSORS_API)
-
-    protected val fitnessSensors = Sensors
-  }
-
-  trait PlayServicesFitnessRecording { self : PlayServices =>
-    self.addApi(Fitness.RECORDING_API)
-
-    protected val fitnessRecording = Recording
-  }
-
-  trait PlayServicesFitnessSessions { self : PlayServices =>
-    self.addApi(Fitness.SESSIONS_API)
-
-    protected val fitnessSessions = Sessions
-  }
-
-  trait PlayServicesFitnessHistory { self : PlayServices =>
-    self.addApi(Fitness.HISTORY_API)
-
-    protected val fitnessHistory = History
-  }
-
-  trait PlayServicesFitnessBle { self : PlayServices =>
-    self.addApi(Fitness.BLE_API)
-
-    protected val fitnessBle = Ble
-  }
-
-  trait PlayServicesFitnessConfig { self : PlayServices =>
-    self.addApi(Fitness.CONFIG_API)
-
-    protected val fitnessConfig = Config
-  }
-
-  trait PlayServicesFitness extends AnyRef
-    with PlayServicesFitnessSensors
-    with PlayServicesFitnessRecording
-    with PlayServicesFitnessSessions
-    with PlayServicesFitnessHistory
-    with PlayServicesFitnessBle
-    with PlayServicesFitnessConfig
-  {
-    self : PlayServices =>
-  }
-
-
+  @loadApi(Fitness.SensorsApi, Fitness.SENSORS_API) object Sensors {}
+  @loadApi(Fitness.RecordingApi, Fitness.RECORDING_API) object Recording {}
+  @loadApi(Fitness.SessionsApi, Fitness.SESSIONS_API) object Sessions {}
+  @loadApi(Fitness.HistoryApi, Fitness.HISTORY_API) object History {}
+  @loadApi(Fitness.BleApi, Fitness.BLE_API) object Ble {}
+  @loadApi(Fitness.ConfigApi, Fitness.CONFIG_API) object Config {}
 
 }

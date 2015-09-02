@@ -21,14 +21,6 @@ import de.esotechnik.playservicesscala.macros.loadApi
 
 package object wallet {
 
-  @loadApi(Wallet.Payments) object Payments {}
-
-  trait PlayServicesWallet { self : PlayServices =>
-    self.addApi(Wallet.API, walletOptions)
-
-    protected val walletOptions : WalletOptions
-
-    protected val payments = Payments
-  }
+  @loadApi(Wallet.Payments, Wallet.API) object Payments {}
 
 }

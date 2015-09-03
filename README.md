@@ -209,8 +209,8 @@ for each `play-services-` split project.
 There is also a `playservices-scala` project that aggregates all subprojects, but you probably
 don't want to use that or you'll hit the 65,536 method limit very quickly, even when using proguard.
 
-License
-======
+
+## License ##
 
 Copyright (C) 2015 Bernhard Frauendienst
 

@@ -1,5 +1,7 @@
 # Play Services for Scala #
 
+[![Join the chat at https://gitter.im/oxc/playservices-scala](https://badges.gitter.im/Join%20Chat.svg)](https://gitter.im/oxc/playservices-scala?utm_source=badge&utm_medium=badge&utm_campaign=pr-badge&utm_content=badge)
+
 A collection of traits and objects for making
 [Google Play Services](https://developers.google.com/android/) more convenient to use when
 programming for Android in Scala.

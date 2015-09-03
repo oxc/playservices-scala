@@ -4,11 +4,15 @@ A collection of traits and objects for making
 [Google Play Services](https://developers.google.com/android/) more convenient to use when
 programming for Android in Scala.
 
-## Disclaimer ##
+## Issues / Contributions ##
 
 Please be aware that up until now, this library is untested in large parts. Please report any
 issues or improvements using the GitHub [Issues](https://github.com/oxc/playservices-scala/issues)
 system.
+
+This also means that the library is possibly still subject to major changes.
+
+Contributions are welcome and encouraged!
 
 ## Usage ##
 

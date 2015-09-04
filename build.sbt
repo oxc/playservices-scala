@@ -11,7 +11,7 @@ homepage in ThisBuild := Some(url("https://github.com/oxc/playservices-scala"))
 licenses in ThisBuild += ("Apache-2.0", url("http://opensource.org/licenses/Apache-2.0"))
 organizationHomepage in ThisBuild := None
 
-version in ThisBuild := libraryVersion.value + "-gms_" + playServicesVersion.value + (if (isSnapshot.value) "-SNAPSHOT")
+version in ThisBuild := libraryVersion.value + "-gms_" + playServicesVersion.value + (if (isSnapshot.value) "-SNAPSHOT" else "")
 
 bintrayReleaseOnPublish in ThisBuild := false
 

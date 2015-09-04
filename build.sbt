@@ -15,24 +15,25 @@ version in ThisBuild := libraryVersion.value + "-gms_" + playServicesVersion.val
 
 bintrayReleaseOnPublish in ThisBuild := false
 
+val packageName = "playservices-scala"
+
 lazy val root = (project in file(".")).
   settings(
-    name := "playservices-scala",
+    name := packageName,
     artifacts := Seq()
   ).
   aggregate(allModules.map(p => p : ProjectReference): _*).
   dependsOn(allModules.map(p => p : ClasspathDep[ProjectReference]): _*)
 
 def commonSettings(project : Project) = {
-  val prefix = "playservices-scala-"
   val module = project.id
 
-  (project in file(prefix + module)).
+  project.
     settings(android.Plugin.androidBuildJar).
     settings(
-      name := prefix + module,
+      name := s"$packageName-$module",
 
-      bintrayPackage := "playservices-scala",
+      bintrayPackage := packageName,
 
       libraryProject in Android := true,
       transitiveAndroidLibs in Android := false,
@@ -52,7 +53,7 @@ def commonSettings(project : Project) = {
 def asSubProject(project : Project) = {
   val module = project.id
 
-  project.configure(commonSettings).
+  (project in file(s"modules/$module")).configure(commonSettings).
     dependsOn(core).
     settings(
       libraryDependencies ++= Seq(

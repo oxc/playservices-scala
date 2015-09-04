@@ -1,6 +1,6 @@
 import Build._
 
-libraryVersion in ThisBuild := "0.1"
+libraryVersion in ThisBuild := "0.1.0"
 playServicesVersion in ThisBuild := "7.8.0"
 isSnapshot := true
 

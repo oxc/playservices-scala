@@ -84,9 +84,17 @@ class MyActivity extends Activity with PlayServices {
   apis ?= Wearable.API
 
   override onConnected(bundle: Bundle) = {
-    val playerName = Players.getCurrentPlayer().getDisplayName
+    if (googleApiClient.hasConnectedApi(Wearable.API)) {
+      Wearable.MessageApi.addListener(googleApiClient, myWearableListener)
+    }
+  }
 
-    Toast.makeText(this, s"Hi $playerName", Toast.LENGTH_LONG).show()
+  override def onStop() = {
+    super.onStop();
+
+    if (googleApiClient.hasConnectedApi(Wearable.API)) {
+      Wearable.MessageApi.removeListener(googleApiClient, myWearableListener)
+    }
   }
 }
 ```
@@ -144,6 +152,30 @@ class MyActivity extends Activity with PlayServices {
   }
 }
 ```
+
+#### Option[_] for optional APIs ####
+ApiWrapper can be tested for connectivity by using obtaining an `Option[_]` from their `ifAvailable`
+method, or by simply applying a body (which is short-hand for `wrapper.ifAvailable.map`). The above
+Wearable example could be rewritten as:
+
+```scala
+import de.esotechnik.playservicesscala._
+
+class MyActivity extends Activity with PlayServices {
+  apis ?= wearable.Message
+
+  override onConnected(bundle: Bundle) = {
+    wearable.Message { _.addListener(myWearableListener) }
+  }
+
+  override def onStop() = {
+    super.onStop();
+
+    wearable.Message { _.removeListener(myWearableListener) }
+  }
+}
+```
+
 
 ### Module specific API ###
 

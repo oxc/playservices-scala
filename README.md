@@ -179,6 +179,14 @@ class MyActivity extends Activity with PlayServices {
 
 ### Module specific API ###
 
+For some modules, there is also some module-specific API provided by the library.
+
+NOTE: Please be aware that I have not used several of the Google Play modules myself, so if you feel
+there could be a convenient Scala wrapper for some of the Java api, don't hesitate to create an
+Issue or, even better, a Pull Request.
+
+The following module-specific additional APIs are available so far:
+
 #### Drive ####
 
 For Google Drive queries, the provided implicit conversions allow you to write such queries in a

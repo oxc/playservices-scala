@@ -1,5 +1,6 @@
 # Play Services for Scala #
 
+[ ![Download](https://api.bintray.com/packages/oxc/maven/playservices-scala/images/download.svg) ](https://bintray.com/oxc/maven/playservices-scala/_latestVersion) 
 [![Join the chat at https://gitter.im/oxc/playservices-scala](https://badges.gitter.im/Join%20Chat.svg)](https://gitter.im/oxc/playservices-scala?utm_source=badge&utm_medium=badge&utm_campaign=pr-badge&utm_content=badge)
 
 A collection of traits and objects for making

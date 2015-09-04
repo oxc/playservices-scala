@@ -32,6 +32,8 @@ def commonSettings(project : Project) = {
     settings(
       name := prefix + module,
 
+      bintrayPackage := "playservices-scala",
+
       libraryProject in Android := true,
       transitiveAndroidLibs in Android := false,
 

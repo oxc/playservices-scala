@@ -33,9 +33,9 @@ package object playservicesscala {
 
     protected val apis = new DeclaredApis()
 
-    lazy implicit protected val googleApiClient : GoogleApiClient = buildGoogleApiClient()
+    lazy implicit protected val googleApiClient : GoogleApiClient = buildGoogleApiClient().build()
 
-    private def buildGoogleApiClient(): GoogleApiClient = {
+    protected def buildGoogleApiClient(): GoogleApiClient.Builder = {
       val builder = new GoogleApiClient.Builder(this)
         .addConnectionCallbacks(this)
         .addOnConnectionFailedListener(this)
@@ -56,7 +56,7 @@ package object playservicesscala {
       }
       apis.frozen = true
 
-      return builder.build()
+      return builder
     }
 
     override def onStart(): Unit = {

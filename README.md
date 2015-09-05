@@ -73,14 +73,12 @@ class MyActivity extends Activity with PlayServices {
 ##### Optional APIs #####
 
 Some APIs, namely the `Wearable` API, are not always available. Those APIs can either be added
-using the `ifAvailable` method, or the `apis ?=` mutator:
+using the `apis ?=` mutator:
 
 ```scala
 import de.esotechnik.playservicesscala._
 
 class MyActivity extends Activity with PlayServices {
-  // those two lines are equivalent
-  apis += Wearable.API.ifAvailable
   apis ?= Wearable.API
 
   override onConnected(bundle: Bundle) = {
@@ -98,6 +96,32 @@ class MyActivity extends Activity with PlayServices {
   }
 }
 ```
+
+#### OAuth Scopes ####
+
+Scopes can be added by simply appending them to the API dependency using yet another `%` method.
+This adds them to the builder for normal apis, and passes them to the `addApiIfAvailable` call
+for optional apis:
+
+```scala
+import com.google.android.gms
+import de.esotechnik.playservicesscala._
+import de.esotechnik.playservicesscala.plus.Plus
+import de.esotechnik.playservicesscala.wearable.Wearable
+
+class MyActivity extends Activity with PlayServices {
+
+  apis += Drive % gms.drive.Drive.SCOPE_APPFOLDER
+
+  apis ?= Plus % plusOptions() % gms.plus.Plus.SCOPE_PLUS_LOGIN
+
+  def plusOptions() = new PlusOptions.Builder()
+    .addActivityTypes("http://schemas.google.com/AddActivity")
+    .build()
+}
+```
+
+
 
 ### API wrappers ###
 

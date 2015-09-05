@@ -70,14 +70,6 @@ package object playservicesscala {
       Log.d(TAG, "Disconnecting GoogleApiClient...")
       googleApiClient.disconnect()
     }
-
-    val connectionFailedResolutionResultCode: Int = 1001
-
-    override def onConnectionFailed(connectionResult : ConnectionResult) {
-      if (connectionResult.hasResolution) {
-        connectionResult.startResolutionForResult(this, connectionFailedResolutionResultCode)
-      }
-    }
   }
 
   class DeclaredApis {

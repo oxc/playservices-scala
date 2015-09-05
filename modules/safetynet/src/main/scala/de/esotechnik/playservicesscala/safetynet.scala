@@ -16,10 +16,10 @@
 package de.esotechnik.playservicesscala
 
 import com.google.android.gms.{safetynet => gms}
-import de.esotechnik.playservicesscala.macros.loadApi
+import de.esotechnik.playservicesscala.macros.{provideApi, requireApi}
 
 package object safetynet {
 
-  @loadApi(gms.SafetyNet.SafetyNetApi, gms.SafetyNet.API) object SafetyNet {}
+  @requireApi(gms.SafetyNet.API) @provideApi(gms.SafetyNet.SafetyNetApi) object SafetyNet {}
 
 }

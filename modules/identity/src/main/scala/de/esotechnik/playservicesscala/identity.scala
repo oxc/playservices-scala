@@ -15,14 +15,13 @@
 
 package de.esotechnik.playservicesscala
 
-import com.google.android.gms.identity.intents.Address.AddressOptions
 import com.google.android.gms.identity.intents.{Address => PlayServicesAddress, UserAddressRequest}
 import com.google.android.gms.common.api.{Api, GoogleApiClient}
+import de.esotechnik.playservicesscala.macros.requireApi
 
 package object identity {
 
-  object Address extends ApiWrapper[Api[PlayServicesAddress.AddressOptions]] {
-    val requiredApi = PlayServicesAddress.API
+  @requireApi(PlayServicesAddress.API) object Address extends AnyRef with ApiProvider {
 
     def requestUserAddress(request: UserAddressRequest,requestCode: Int)(implicit googleApiClient: GoogleApiClient) =
       PlayServicesAddress.requestUserAddress(googleApiClient, request, requestCode)

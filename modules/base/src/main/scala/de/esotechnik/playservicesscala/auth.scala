@@ -15,13 +15,16 @@
 
 package de.esotechnik.playservicesscala
 
-import com.google.android.gms.auth.api.Auth
-import com.google.android.gms.auth.api.Auth.AuthCredentialsOptions
 import com.google.android.gms.auth.{api => gms}
-import de.esotechnik.playservicesscala.macros.loadApi
+import de.esotechnik.playservicesscala.macros.{provideApi, requireApi}
 
 package object auth {
-  
-  @loadApi(Auth.CredentialsApi, Auth.CREDENTIALS_API) object Credentials {}
+
+  object Auth {
+
+    @requireApi(gms.Auth.CREDENTIALS_API)
+    @provideApi(gms.Auth.CredentialsApi) object Credentials {}
+
+  }
 
 }

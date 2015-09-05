@@ -15,12 +15,13 @@
 
 package de.esotechnik.playservicesscala
 
-import com.google.android.gms.wallet.Wallet
-import com.google.android.gms.wallet.Wallet.WalletOptions
-import de.esotechnik.playservicesscala.macros.loadApi
+import com.google.android.gms.{ wallet => gms}
+import de.esotechnik.playservicesscala.macros.{provideApi, requireApi}
 
 package object wallet {
 
-  @loadApi(Wallet.Payments, Wallet.API) object Payments {}
+  @requireApi(gms.Wallet.API) object Wallet {
+    @provideApi(gms.Wallet.Payments) object Payments {}
+  }
 
 }

@@ -15,14 +15,17 @@
 
 package de.esotechnik.playservicesscala
 
-import com.google.android.gms.plus.Plus
-import com.google.android.gms.plus.Plus.PlusOptions
-import de.esotechnik.playservicesscala.macros.loadApi
+import com.google.android.gms.{plus => gms}
+import de.esotechnik.playservicesscala.macros.{provideApi, requireApi}
 
 package object plus {
 
-  @loadApi(Plus.AccountApi, Plus.API) object Account {}
-  @loadApi(Plus.MomentsApi, Plus.API) object Moments {}
-  @loadApi(Plus.PeopleApi, Plus.API) object People {}
+  @requireApi(gms.Plus.API) object Plus {
+
+    @provideApi(gms.Plus.AccountApi) object Account {}
+    @provideApi(gms.Plus.MomentsApi) object Moments {}
+    @provideApi(gms.Plus.PeopleApi) object People {}
+
+  }
 
 }

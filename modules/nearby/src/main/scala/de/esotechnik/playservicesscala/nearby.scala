@@ -15,13 +15,18 @@
 
 package de.esotechnik.playservicesscala
 
-import com.google.android.gms.nearby.Nearby
-import com.google.android.gms.nearby.messages.MessagesOptions
-import de.esotechnik.playservicesscala.macros.loadApi
+import com.google.android.gms.{nearby => gms}
+import de.esotechnik.playservicesscala.macros.{provideApi, requireApi}
 
 package object nearby {
 
-  @loadApi(Nearby.Connections, Nearby.CONNECTIONS_API) object Connections {}
-  @loadApi(Nearby.Messages, Nearby.MESSAGES_API) object Messages {}
+  object Nearby {
 
+    @requireApi(gms.Nearby.CONNECTIONS_API)
+    @provideApi(gms.Nearby.Connections) object Connections {}
+
+    @requireApi(gms.Nearby.MESSAGES_API)
+    @provideApi(gms.Nearby.Messages) object Messages {}
+
+  }
 }

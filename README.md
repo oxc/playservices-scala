@@ -102,25 +102,34 @@ class MyActivity extends Activity with PlayServices {
 ### API wrappers ###
 
 However, more conveniently, you can use the API wrapper objects that are provided for each API.
-Using Scala's macro feature, for every API a matching wrapper object is created, that accepts the
-`GoogleApiClient` implicitly, which is automatically available if you use the `PlayServices` trait.
 
-Furthermore, every ApiWrapper knows which Api it requires, and there are also implicit conversions
-to ApiDependency available.
+In Google Play Services, there are two types of API objects:
+* First there are the `Api[Options]` objects, which can be added to the GoogleApiClient.Builder.
+  They are mapped to objects extending the `ApiRequirement` trait, can be added to the `apis`
+  property of `PlayServices`, and encapsulate objects of the second type of Api:
+* The second type are method providers, which contain the actual methods the Api provides. Those
+  are mapped to objects extending the `ApiProvider` trait, which contain all the methods from the
+  original Api, but accepting the `GoogleApiClient` implicitly (which is automatically available if
+  you use the `PlayServices` trait on your Activity).
+
+*NOTE*: For simple APIs, where there is only one object of each type, both are mapped onto a single
+object (for example the AppInvite API). Some versatile APIs on the other hand each method provider
+has its own required API. They are still grouped into a parent object for consistency (for example
+the Fitness API).
 
 This lets us re-write above imaginary Games example like this:
 
 
 ```scala
-import de.esotechnik.playservicesscala.games.Players
+import de.esotechnik.playservicesscala.games.Games
 
 class MyActivity extends Activity with PlayServices {
-  apis += Players
+  apis += Games
   // or with options:
-  apis += Players % new GamesOptions.Builder().setShowConnectingPopup(false).build()
+  apis += Games % new GamesOptions.Builder().setShowConnectingPopup(false).build()
 
   override onConnected(bundle: Bundle) = {
-    val playerName = Players.getCurrentPlayer().getDisplayName
+    val playerName = Games.Players.getCurrentPlayer().getDisplayName
 
     Toast.makeText(this, s"Hi $playerName", Toast.LENGTH_LONG).show()
   }
@@ -133,11 +142,12 @@ Apart from accepting an implicit client, the API wrappers also convert PendingRe
 which makes them much more comfortable to use:
 
 ```scala
-import de.esotechnik.playservicesscala.games.GamesMetadata
+import de.esotechnik.playservicesscala.games.Games
+import de.esotechnik.playservicesscala.games.Games.GamesMetaData
 import scala.collection.JavaConversions._
 
 class MyActivity extends Activity with PlayServices {
-  apis += GamesMetadata
+  apis += Games
 
   override def onResume() = {
     super.onResume()
@@ -154,24 +164,27 @@ class MyActivity extends Activity with PlayServices {
 ```
 
 #### Option[_] for optional APIs ####
-ApiWrapper can be tested for connectivity by using obtaining an `Option[_]` from their `ifAvailable`
-method, or by simply applying a body (which is short-hand for `wrapper.ifAvailable.map`). The above
-Wearable example could be rewritten as:
+ApiRequirements can be tested for connectivity by using obtaining an `Option[_]` from their
+`ifAvailable` method, or by simply applying a body (which is short-hand for
+`wrapper.ifAvailable.map`).
+
+The above Wearable example could be rewritten as:
 
 ```scala
 import de.esotechnik.playservicesscala._
+import de.esotechnik.playservicesscala.wearable.Wearable
 
 class MyActivity extends Activity with PlayServices {
-  apis ?= wearable.Message
+  apis ?= Wearable
 
   override onConnected(bundle: Bundle) = {
-    wearable.Message { _.addListener(myWearableListener) }
+    Wearable.Message { _.addListener(myWearableListener) }
   }
 
   override def onStop() = {
     super.onStop();
 
-    wearable.Message { _.removeListener(myWearableListener) }
+    Wearable.Message { _.removeListener(myWearableListener) }
   }
 }
 ```
@@ -254,7 +267,9 @@ here for your convenience, if you have some logic that automatically adds the ma
 for each `play-services-` split project.
 
 There is also a `playservices-scala` project that aggregates all subprojects, but you probably
-don't want to use that or you'll hit the 65,536 method limit very quickly, even when using proguard.
+don't want to use that or you'll hit the 65,536 method limit very quickly, even when using proguard,
+because it not only adds some retained classes itself, but especially because it pulls in all
+Play Services modules (which were split exactly for that reason in the first place).
 
 
 ## License ##

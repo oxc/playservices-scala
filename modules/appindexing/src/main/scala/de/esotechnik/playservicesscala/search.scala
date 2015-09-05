@@ -16,10 +16,10 @@
 package de.esotechnik.playservicesscala
 
 import com.google.android.gms.{search => gms}
-import de.esotechnik.playservicesscala.macros.loadApi
+import de.esotechnik.playservicesscala.macros.{provideApi, requireApi}
 
 package object search {
 
-  @loadApi(gms.SearchAuth.SearchAuthApi, gms.SearchAuth.API) object SearchAuth {}
+  @requireApi(gms.SearchAuth.API) @provideApi(gms.SearchAuth.SearchAuthApi) object SearchAuth {}
 
 }

@@ -23,15 +23,17 @@ import com.google.android.gms.drive.query.{Query => PlayQuery, SortOrder, Filter
 import com.google.android.gms.drive.query.Query.{Builder => QueryBuilder}
 import com.google.android.gms.drive.query.SortOrder.{Builder => SortOrderBuilder}
 import com.google.android.gms.{drive => gms}
-import de.esotechnik.playservicesscala.macros.loadApi
+import de.esotechnik.playservicesscala.macros.{provideApi, requireApi}
 
 import scala.collection.JavaConversions._
 
 package object drive {
 
-  @loadApi(gms.Drive.DriveApi, gms.Drive.API) object Drive {}
+  @requireApi(gms.Drive.API) @provideApi(gms.Drive.DriveApi) object Drive {
 
-  @loadApi(gms.Drive.DrivePreferencesApi, gms.Drive.API) object DrivePreferences {}
+    @provideApi(gms.Drive.DrivePreferencesApi) object Preferences {}
+  }
+
 
   /**************
    * Filter api *

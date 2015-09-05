@@ -15,13 +15,17 @@
 
 package de.esotechnik.playservicesscala
 
-import com.google.android.gms.location.LocationServices
-import de.esotechnik.playservicesscala.macros.loadApi
+import com.google.android.gms.{location => gms}
+import de.esotechnik.playservicesscala.macros.{provideApi, requireApi}
 
 package object location {
 
-  @loadApi(LocationServices.FusedLocationApi, LocationServices.API) object FusedLocationProvider {}
-  @loadApi(LocationServices.GeofencingApi, LocationServices.API) object Geofencing {}
-  @loadApi(LocationServices.SettingsApi, LocationServices.API) object Settings {}
+  @requireApi(gms.LocationServices.API) object LocationService {
+
+    @provideApi(gms.LocationServices.FusedLocationApi) object FusedLocation {}
+    @provideApi(gms.LocationServices.GeofencingApi) object Geofencing {}
+    @provideApi(gms.LocationServices.SettingsApi) object Settings {}
+
+  }
 
 }

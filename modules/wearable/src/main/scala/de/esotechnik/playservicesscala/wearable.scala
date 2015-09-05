@@ -15,16 +15,18 @@
 
 package de.esotechnik.playservicesscala
 
-import com.google.android.gms.wearable.Wearable
-import com.google.android.gms.wearable.Wearable.WearableOptions
-import de.esotechnik.playservicesscala.macros.loadApi
+import com.google.android.gms.{wearable => gms}
+import de.esotechnik.playservicesscala.macros.{provideApi, requireApi}
 
 package object wearable {
 
-  @loadApi(Wearable.CapabilityApi, Wearable.API) object Capability {}
-  @loadApi(Wearable.ChannelApi, Wearable.API) object Channel {}
-  @loadApi(Wearable.DataApi, Wearable.API) object Data {}
-  @loadApi(Wearable.MessageApi, Wearable.API) object Message {}
-  @loadApi(Wearable.NodeApi, Wearable.API) object Node {}
+  @requireApi(gms.Wearable.API) object Wearable {
 
+    @provideApi(gms.Wearable.CapabilityApi) object Capability {}
+    @provideApi(gms.Wearable.ChannelApi) object Channel {}
+    @provideApi(gms.Wearable.DataApi) object Data {}
+    @provideApi(gms.Wearable.MessageApi) object Message {}
+    @provideApi(gms.Wearable.NodeApi) object Node {}
+
+  }
 }

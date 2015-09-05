@@ -16,10 +16,10 @@
 package de.esotechnik.playservicesscala
 
 import com.google.android.gms.{panorama => gms}
-import de.esotechnik.playservicesscala.macros.loadApi
+import de.esotechnik.playservicesscala.macros.{provideApi, requireApi}
 
 package object panorama {
 
-  @loadApi(gms.Panorama.PanoramaApi, gms.Panorama.API) object Panorama {}
+  @requireApi(gms.Panorama.API) @provideApi(gms.Panorama.PanoramaApi) object Panorama {}
 
 }

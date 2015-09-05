@@ -104,8 +104,8 @@ package object playservicesscala {
     def %(options: => O) = withOptions(options)
   }
 
-  implicit def wrapperToDependency[O <: NotRequiredOptions](apiWrapper: ApiWrapper[PlayApi[O]]) = ApiNoOptions(apiWrapper.requiredApi)
-  implicit def wrapperToRichApi[O <: HasOptions](apiWrapper : ApiWrapper[PlayApi[O]]) = RichApi(apiWrapper.requiredApi)
+  implicit def requirementToDependency[O <: NotRequiredOptions](apiRequrement: ApiRequirement[PlayApi[O]]) = ApiNoOptions(apiRequrement.requiredApi)
+  implicit def requirementToRichApi[O <: HasOptions](apiRequirement : ApiRequirement[PlayApi[O]]) = RichApi(apiRequirement.requiredApi)
 
   final class OptionalApiDependency(apiDependency: ApiDependency) extends ApiDependency {
     override private[playservicesscala] def addApi(builder: ClientBuilder): Unit = apiDependency.addApiIfAvailable(builder)

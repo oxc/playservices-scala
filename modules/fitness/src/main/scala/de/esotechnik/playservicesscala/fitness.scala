@@ -15,16 +15,30 @@
 
 package de.esotechnik.playservicesscala
 
-import com.google.android.gms.fitness.Fitness
-import de.esotechnik.playservicesscala.macros.loadApi
+import com.google.android.gms.{fitness => gms}
+import de.esotechnik.playservicesscala.macros.{provideApi, requireApi}
 
 package object fitness {
 
-  @loadApi(Fitness.SensorsApi, Fitness.SENSORS_API) object Sensors {}
-  @loadApi(Fitness.RecordingApi, Fitness.RECORDING_API) object Recording {}
-  @loadApi(Fitness.SessionsApi, Fitness.SESSIONS_API) object Sessions {}
-  @loadApi(Fitness.HistoryApi, Fitness.HISTORY_API) object History {}
-  @loadApi(Fitness.BleApi, Fitness.BLE_API) object Ble {}
-  @loadApi(Fitness.ConfigApi, Fitness.CONFIG_API) object Config {}
+  object Fitness {
 
+    @requireApi(gms.Fitness.SENSORS_API)
+    @provideApi(gms.Fitness.SensorsApi) object Sensors {}
+
+    @requireApi(gms.Fitness.RECORDING_API)
+    @provideApi(gms.Fitness.RecordingApi) object Recording {}
+
+    @requireApi(gms.Fitness.SESSIONS_API)
+    @provideApi(gms.Fitness.SessionsApi) object Sessions {}
+
+    @requireApi(gms.Fitness.HISTORY_API)
+    @provideApi(gms.Fitness.HistoryApi) object History {}
+
+    @requireApi(gms.Fitness.BLE_API)
+    @provideApi(gms.Fitness.BleApi) object Ble {}
+
+    @requireApi(gms.Fitness.CONFIG_API)
+    @provideApi(gms.Fitness.ConfigApi) object Config {}
+
+  }
 }

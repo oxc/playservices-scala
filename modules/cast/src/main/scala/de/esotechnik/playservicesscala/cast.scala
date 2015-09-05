@@ -15,14 +15,15 @@
 
 package de.esotechnik.playservicesscala
 
-import com.google.android.gms.cast.Cast.CastOptions
-import com.google.android.gms.cast.CastRemoteDisplay.CastRemoteDisplayOptions
 import com.google.android.gms.{cast => gms}
-import de.esotechnik.playservicesscala.macros.loadApi
+import de.esotechnik.playservicesscala.macros.{provideApi, requireApi}
 
 package object cast {
 
-  @loadApi(gms.Cast.CastApi : gms.Cast.CastApi, gms.Cast.API) object Cast {}
-  @loadApi(gms.CastRemoteDisplay.CastRemoteDisplayApi, gms.Cast.API) object CastRemoteDisplay {}
+  @requireApi(gms.Cast.API) @provideApi(gms.Cast.CastApi : gms.Cast.CastApi) object Cast {
+
+    @provideApi(gms.CastRemoteDisplay.CastRemoteDisplayApi) object RemoteDisplay {}
+
+  }
 
 }

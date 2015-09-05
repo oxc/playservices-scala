@@ -19,35 +19,35 @@ import android.content.Intent
 import android.view.View
 import com.google.android.gms.common.api.{GoogleApiClient, Status, Api}
 import com.google.android.gms.{games => gms}
-import de.esotechnik.playservicesscala.macros.loadApi
+import de.esotechnik.playservicesscala.macros.{provideApi, requireApi}
 
 import scala.concurrent.Future
 
 package object games {
 
-  object Games extends ApiWrapper[Api[gms.Games.GamesOptions]] {
-    val requiredApi = gms.Games.API
+  @requireApi(gms.Games.API) object Games extends ApiProvider {
 
-    def getAppId()(implicit apiClient : GoogleApiClient) : String = gms.Games.getAppId(apiClient)
-    def getCurrentAccountName()(implicit apiClient : GoogleApiClient) : String = gms.Games.getCurrentAccountName(apiClient)
-    def getSdkVariant()(implicit apiClient : GoogleApiClient) : Int = gms.Games.getSdkVariant(apiClient)
-    def getSettingsIntent()(implicit apiClient : GoogleApiClient) : Intent = gms.Games.getSettingsIntent(apiClient)
-    def setGravityForPopups(gravity : Int)(implicit apiClient : GoogleApiClient) : Unit = gms.Games.setGravityForPopups(apiClient, gravity)
-    def setViewForPopups(gamesContentView : View)(implicit apiClient : GoogleApiClient) : Unit = gms.Games.setViewForPopups(apiClient, gamesContentView)
-    def signOut()(implicit apiClient : GoogleApiClient) : Future[Status] = gms.Games.signOut(apiClient)
+    def getAppId()(implicit apiClient: GoogleApiClient): String = gms.Games.getAppId(apiClient)
+    def getCurrentAccountName()(implicit apiClient: GoogleApiClient): String = gms.Games.getCurrentAccountName(apiClient)
+    def getSdkVariant()(implicit apiClient: GoogleApiClient): Int = gms.Games.getSdkVariant(apiClient)
+    def getSettingsIntent()(implicit apiClient: GoogleApiClient): Intent = gms.Games.getSettingsIntent(apiClient)
+    def setGravityForPopups(gravity: Int)(implicit apiClient: GoogleApiClient): Unit = gms.Games.setGravityForPopups(apiClient, gravity)
+    def setViewForPopups(gamesContentView: View)(implicit apiClient: GoogleApiClient): Unit = gms.Games.setViewForPopups(apiClient, gamesContentView)
+    def signOut()(implicit apiClient: GoogleApiClient): Future[Status] = gms.Games.signOut(apiClient)
+
+    @provideApi(gms.Games.Achievements) object Achievements {}
+    @provideApi(gms.Games.Events) object Events {}
+    @provideApi(gms.Games.GamesMetadata) object GamesMetadata {}
+    @provideApi(gms.Games.Invitations) object Invitations {}
+    @provideApi(gms.Games.Leaderboards) object Leaderboards {}
+    @provideApi(gms.Games.Notifications) object Notifications {}
+    @provideApi(gms.Games.Players) object Players {}
+    @provideApi(gms.Games.Quests) object Quests {}
+    @provideApi(gms.Games.RealTimeMultiplayer) object RealTimeMultiplayer {}
+    @provideApi(gms.Games.Requests) object Requests {}
+    @provideApi(gms.Games.Snapshots) object Snapshots {}
+    @provideApi(gms.Games.TurnBasedMultiplayer) object TurnBasedMultiplayer {}
+
   }
-
-  @loadApi(gms.Games.Achievements, gms.Games.API) object Achievements {}
-  @loadApi(gms.Games.Events, gms.Games.API) object Events {}
-  @loadApi(gms.Games.GamesMetadata, gms.Games.API) object GamesMetadata {}
-  @loadApi(gms.Games.Invitations, gms.Games.API) object Invitations {}
-  @loadApi(gms.Games.Leaderboards, gms.Games.API) object Leaderboards {}
-  @loadApi(gms.Games.Notifications, gms.Games.API) object Notifications {}
-  @loadApi(gms.Games.Players, gms.Games.API) object Players {}
-  @loadApi(gms.Games.Quests, gms.Games.API) object Quests {}
-  @loadApi(gms.Games.RealTimeMultiplayer, gms.Games.API) object RealTimeMultiplayer {}
-  @loadApi(gms.Games.Requests, gms.Games.API) object Requests {}
-  @loadApi(gms.Games.Snapshots, gms.Games.API) object Snapshots {}
-  @loadApi(gms.Games.TurnBasedMultiplayer, gms.Games.API) object TurnBasedMultiplayer {}
-
 }
+  

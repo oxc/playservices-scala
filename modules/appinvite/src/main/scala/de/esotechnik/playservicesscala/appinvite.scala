@@ -15,12 +15,11 @@
 
 package de.esotechnik.playservicesscala
 
-import com.google.android.gms.appinvite.AppInviteApi
 import com.google.android.gms.{appinvite => gms}
-import de.esotechnik.playservicesscala.macros.loadApi
+import de.esotechnik.playservicesscala.macros.{provideApi, requireApi}
 
 package object appinvite {
 
-  @loadApi(gms.AppInvite.AppInviteApi, gms.AppInvite.API) object AppInvite {}
+  @requireApi(gms.AppInvite.API) @provideApi(gms.AppInvite.AppInviteApi) object AppInvite {}
 
 }

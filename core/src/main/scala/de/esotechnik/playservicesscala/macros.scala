@@ -27,9 +27,14 @@ package object macros {
   import scala.reflect.macros.whitebox.Context
   import scala.language.experimental.macros
 
-  @compileTimeOnly("@playApi requires macro paradise")
-  class loadApi(api: Any, requiredApi: Api[_]) extends StaticAnnotation {
-    def macroTransform(annottees: Any*) = macro ApiLoaderMacros.loadApi
+  @compileTimeOnly("@requireApi requires macro paradise")
+  class requireApi(requiredApi: Api[_]) extends StaticAnnotation {
+    def macroTransform(annottees: Any*) = macro ApiLoaderMacros.requireApi
+  }
+
+  @compileTimeOnly("@provideApi requires macro paradise")
+  class provideApi(api: Any) extends StaticAnnotation {
+    def macroTransform(annottees: Any*) = macro ApiLoaderMacros.provideApi
   }
 
   class ApiLoaderMacros(val c: Context) {
@@ -38,15 +43,48 @@ package object macros {
 
     def bail(message: String) = c.abort(c.enclosingPosition, message)
 
-    def loadApi(annottees: c.Expr[Any]*) = {
-      val (apiTree, requiredApiTree) = c.macroApplication match {
-        case Apply(Select(q"new loadApi($aTree, $rTree)", _), _) => (aTree : Tree, rTree : Tree)
+    /**
+     * Lets the annotated object extend the ApiLoader trait with the provided Api type.
+     *
+     * At the moment this could be easily implemented in code, but having it as a macro already
+     * allows us to quickly add new features like Option builders etc.
+     * 
+     * @param annottees
+     * @return
+     */
+    def requireApi(annottees: c.Expr[Any]*) = {
+      val requiredApiTree = c.macroApplication match {
+        case Apply(Select(q"new requireApi($rTree)", _), _) => (rTree: Tree)
       }
-      val api = c.Expr(c.typecheck(apiTree))
       val requiredApi = c.Expr(c.typecheck(requiredApiTree))
 
       annottees.map(_.tree) match {
-        case List(q"object $name extends $parent { ..$body }") => {
+        case List(q"..$annotations object $name extends $parent with ..$traits { ..$body }") => {
+
+          val result = q"""
+              $annotations object $name extends $parent with ..$traits with ApiRequirement[${requiredApi.actualType}] {
+                val requiredApi = $requiredApiTree
+
+                ..$body
+              }
+            """
+
+          c.info(c.enclosingPosition, s"Generated $result", false)
+
+          c.Expr(result)
+        }
+        case mismatch => bail(s"@requireApi can only be applied to object definitions. Encountered unexpected ${mismatch}")
+      }
+    }
+
+    def provideApi(annottees: c.Expr[Any]*) = {
+      val apiTree = c.macroApplication match {
+        case Apply(Select(q"new provideApi($aTree)", _), _) => (aTree : Tree)
+      }
+      val api = c.Expr(c.typecheck(apiTree))
+
+      annottees.map(_.tree) match {
+        case List(q"..$annotations object $name extends $parent with ..$traits { ..$body }") => {
 
           val apiClientType = typeOf[GoogleApiClient]
 
@@ -83,8 +121,7 @@ package object macros {
           }
 
           val result = q"""
-              object $name extends $parent with ApiWrapper[${requiredApi.actualType}] {
-                val requiredApi = $requiredApiTree
+              $annotations object $name extends $parent with ..$traits with ApiProvider {
 
                 ..$body
                 ..$defs
@@ -95,7 +132,7 @@ package object macros {
 
           c.Expr(result)
         }
-        case _ => bail("@loadApi can only be applied to object definitions")
+        case mismatch => bail(s"@provideApi can only be applied to object definitions. Encountered unexpected ${mismatch}")
       }
     }
 
@@ -162,11 +199,11 @@ package object macros {
   }
 }
 
-trait ApiWrapper[A <: Api[_]] {
+trait ApiRequirement[A <: Api[_]] {
 
-  val requiredApi : A
+  val requiredApi: A
 
-  def apply[R](body : this.type => R)(implicit googleApiClient: GoogleApiClient) : Option[R] = {
+  def apply[R](body: this.type => R)(implicit googleApiClient: GoogleApiClient): Option[R] = {
     (this ifAvailable) map body
   }
 
@@ -180,6 +217,9 @@ trait ApiWrapper[A <: Api[_]] {
 
   def ?(implicit googleApiClient: GoogleApiClient) = ifAvailable
 
+}
+
+trait ApiProvider {
   /**
    * Converts a PendingResult to a scala Future. This is protected on purpose, since the caller
    * must ensure that only ever on such Future is created per PendingResult instance, and the

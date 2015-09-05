@@ -16,10 +16,10 @@
 package de.esotechnik.playservicesscala
 
 import com.google.android.gms.{appindexing => gms}
-import de.esotechnik.playservicesscala.macros.loadApi
+import de.esotechnik.playservicesscala.macros.{provideApi, requireApi}
 
 package object appindexing {
 
-  @loadApi(gms.AppIndex.AppIndexApi, gms.AppIndex.API) object AppIndex {}
+  @provideApi(gms.AppIndex.AppIndexApi) object AppIndex {}
 
 }

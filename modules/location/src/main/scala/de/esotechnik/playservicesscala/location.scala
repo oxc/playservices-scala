@@ -20,7 +20,7 @@ import de.esotechnik.playservicesscala.macros.{provideApi, requireApi}
 
 package object location {
 
-  @requireApi(gms.LocationServices.API) object LocationService {
+  @requireApi(gms.LocationServices.API) object LocationServices {
 
     @provideApi(gms.LocationServices.FusedLocationApi) object FusedLocation {}
     @provideApi(gms.LocationServices.GeofencingApi) object Geofencing {}

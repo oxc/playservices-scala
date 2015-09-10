@@ -19,83 +19,89 @@ Contributions are welcome and encouraged!
 
 ## Usage ##
 
-### PlayServices trait ###
+This library mainly consists of two core features, the `PlayServices` trait and the API wrappers.
 
-The central starting point of this library is a trait called `PlayServices`, which you can add on
-your `Activity`. It will automatically create a `GoogleApiClient`, which is started `onStart()` and
-stopped `onStop()`.
+Both can be used individually, but they show their real power when combined together. Therefore,
+the following examples will use always use both features at once. Keep in mind, that you can use
+them separately, if you really want to.
 
-(NOTE: This is only the basics, so please make sure you also read the next sections, so you don't
-miss out on the cool stuff! ;))
+The `PlayServices` trait sets up an implicit `GoogleApiClient` in your Activity with the APIs and
+Scopes you specify, and which is started `onStart()` and stopped `onStop()`. You can add the raw
+Google Play `Api[Options]` instances, and call the raw APIs' methods, but adding and using API
+Wrappers is much more convenient.
 
-#### Adding APIs ####
+The API wrappers provide API calls that take an implicit GoogleApiClient, and simplify adding the
+APIs to the PlayServices trait. You can provide the GoogleApiClient yourself (implicitly or
+explicitly), if you really want to, but the `PlayServices` trait does that already for you.
+
+### Adding APIs ###
 
 Google Play Services APIs can be added to the `api` object in the class body, in form of a
 `ApiDependency` which can be created using one of the implicit conversions available
 in `de.esotechnik.playservicesscala`:
 
 ```scala
-import com.google.android.gms.location.LocationServices
 import de.esotechnik.playservicesscala._
+import de.esotechnik.playservicesscala.location.LocationServices
 
 class MyActivity extends Activity with PlayServices {
-  apis += LocationServices.API
+  apis += LocationServices
 
   override onConnected(bundle: Bundle) = {
-    val lastLocation = LocationServices.FusedLocationApi.getLastLocation(googleApiClient);
+    val lastLocation = LocationServices.FusedLocation.getLastLocation();
 
     Toast.makeText(this, "Last known location: " + lastLocation, Toast.LENGTH_LONG).show()
   }
 }
 ```
 
-##### APIs with Options #####
+#### APIs with Options ####
 
 APIs that require or optionally take options can be added using the implicitly available `%`
 function (or `withOptions` if you prefer a more speaking name):
 
 ```scala
-import com.google.android.gms.games.Games
 import com.google.android.gms.games.Games.GamesOptions
 import de.esotechnik.playservicesscala._
+import de.esotechnik.playservicesscala.games.Games
 
 class MyActivity extends Activity with PlayServices {
-  apis += Games.API % new GamesOptions.Builder().setShowConnectingPopup(false).build()
+  apis += Games % new GamesOptions.Builder().setShowConnectingPopup(false).build()
 
   override onConnected(bundle: Bundle) = {
-    val playerName = Games.Players.getCurrentPlayer(googleApiClient).getDisplayName
+    val playerName = Games.Players.getCurrentPlayer().getDisplayName()
 
     Toast.makeText(this, s"Hi $playerName", Toast.LENGTH_LONG).show()
   }
 }
 ```
 
-##### Optional APIs #####
+#### Optional APIs ####
 
 Some APIs, namely the `Wearable` API, are not always available. Those APIs can either be added
-using the `apis ?=` mutator:
+using the `apis ?=` mutator. They can then be tested for connectivity by using obtaining an
+`Option[_]` from their `ifAvailable` method, or by simply applying a body (which is short-hand for
+`wrapper.ifAvailable.map`):
 
 ```scala
 import de.esotechnik.playservicesscala._
+import de.esotechnik.playservicesscala.wearable.Wearable
 
 class MyActivity extends Activity with PlayServices {
-  apis ?= Wearable.API
+  apis ?= Wearable
 
   override onConnected(bundle: Bundle) = {
-    if (googleApiClient.hasConnectedApi(Wearable.API)) {
-      Wearable.MessageApi.addListener(googleApiClient, myWearableListener)
-    }
+    Wearable.Message { _.addListener(myWearableListener) }
   }
 
   override def onStop() = {
     super.onStop();
 
-    if (googleApiClient.hasConnectedApi(Wearable.API)) {
-      Wearable.MessageApi.removeListener(googleApiClient, myWearableListener)
-    }
+    Wearable.Message { _.removeListener(myWearableListener) }
   }
 }
 ```
+
 
 #### OAuth Scopes ####
 
@@ -121,11 +127,7 @@ class MyActivity extends Activity with PlayServices {
 }
 ```
 
-
-
 ### API wrappers ###
-
-However, more conveniently, you can use the API wrapper objects that are provided for each API.
 
 In Google Play Services, there are two types of API objects:
 * First there are the `Api[Options]` objects, which can be added to the GoogleApiClient.Builder.
@@ -137,28 +139,9 @@ In Google Play Services, there are two types of API objects:
   you use the `PlayServices` trait on your Activity).
 
 *NOTE*: For simple APIs, where there is only one object of each type, both are mapped onto a single
-object (for example the AppInvite API). Some versatile APIs on the other hand each method provider
-has its own required API. They are still grouped into a parent object for consistency (for example
-the Fitness API).
-
-This lets us re-write above imaginary Games example like this:
-
-
-```scala
-import de.esotechnik.playservicesscala.games.Games
-
-class MyActivity extends Activity with PlayServices {
-  apis += Games
-  // or with options:
-  apis += Games % new GamesOptions.Builder().setShowConnectingPopup(false).build()
-
-  override onConnected(bundle: Bundle) = {
-    val playerName = Games.Players.getCurrentPlayer().getDisplayName
-
-    Toast.makeText(this, s"Hi $playerName", Toast.LENGTH_LONG).show()
-  }
-}
-```
+object (for example the AppInvite API). With some versatile APIs on the other hand, each method
+provider has its own required API. They are still grouped into a parent object for consistency (for
+example the Fitness API).
 
 #### Future instead of PendingResult ####
 
@@ -186,33 +169,6 @@ class MyActivity extends Activity with PlayServices {
   }
 }
 ```
-
-#### Option[_] for optional APIs ####
-ApiRequirements can be tested for connectivity by using obtaining an `Option[_]` from their
-`ifAvailable` method, or by simply applying a body (which is short-hand for
-`wrapper.ifAvailable.map`).
-
-The above Wearable example could be rewritten as:
-
-```scala
-import de.esotechnik.playservicesscala._
-import de.esotechnik.playservicesscala.wearable.Wearable
-
-class MyActivity extends Activity with PlayServices {
-  apis ?= Wearable
-
-  override onConnected(bundle: Bundle) = {
-    Wearable.Message { _.addListener(myWearableListener) }
-  }
-
-  override def onStop() = {
-    super.onStop();
-
-    Wearable.Message { _.removeListener(myWearableListener) }
-  }
-}
-```
-
 
 ### Module specific API ###
 

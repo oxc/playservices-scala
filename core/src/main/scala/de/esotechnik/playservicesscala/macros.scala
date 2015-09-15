@@ -17,15 +17,14 @@ package de.esotechnik.playservicesscala
 
 import com.google.android.gms.common.api._
 
-import scala.annotation.implicitNotFound
 import scala.collection.mutable
 import scala.concurrent.{Future, Promise}
-import scala.reflect.macros.TypecheckException
+import scala.language.implicitConversions
 
 package object macros {
 
-  import scala.annotation.{compileTimeOnly, StaticAnnotation}
-  import scala.reflect.macros.whitebox.Context
+  import scala.annotation.{StaticAnnotation, compileTimeOnly}
+  import scala.reflect.macros.whitebox
   import scala.language.experimental.macros
 
   @compileTimeOnly("@requireApi requires macro paradise")
@@ -43,7 +42,7 @@ package object macros {
     def macroTransform(annottees: Any*) = macro ApiLoaderMacros.delegateApi
   }
 
-  class ApiLoaderMacros(val c: Context) {
+  class ApiLoaderMacros(val c: whitebox.Context) {
 
     import c.universe._
 
@@ -77,17 +76,17 @@ package object macros {
               }
             """
 
-          c.info(c.enclosingPosition, s"Generated $result", false)
+          c.info(c.enclosingPosition, s"Generated $result", force = false)
 
           c.Expr(result)
         }
-        case mismatch => bail(s"@requireApi can only be applied to object definitions. Encountered unexpected ${mismatch}")
+        case mismatch => bail(s"@requireApi can only be applied to object definitions. Encountered unexpected $mismatch")
       }
     }
 
     def delegateApi(annottees: c.Expr[Any]*) : c.Expr[Any] = {
       annottees.map(_.tree) match {
-        case List(apiDef : ValDef, q"..$modifiers class $name(..$params) extends $parent with ..$traits { ..$body }" ) => {
+        case List(apiDef : ValDef, q"..$modifiers class $name(..$params) extends $parent with ..$traits { ..$body }" ) =>
 
           val apiVar = q"${apiDef.name} : ${apiDef.tpt}"
           val api = c.Expr(c.typecheck(apiDef.tpt, c.TYPEmode))
@@ -102,22 +101,21 @@ package object macros {
               }
             """
 
-          c.info(c.enclosingPosition, s"Generated $result", false)
+          c.info(c.enclosingPosition, s"Generated $result", force = false)
 
           c.Expr(result)
-        }
-        case mismatch => bail(s"@delegateApi can only be applied to the value param of a class definitions. Encountered unexpected ${mismatch}")
+        case mismatch => bail(s"@delegateApi can only be applied to the value param of a class definitions. Encountered unexpected $mismatch")
       }
     }
 
     def provideApi(annottees: c.Expr[Any]*) : c.Expr[Any] = {
       val apiTree = c.macroApplication match {
-        case Apply(Select(q"new provideApi($aTree)", _), _) => (aTree : Tree)
+        case Apply(Select(q"new provideApi($aTree)", _), _) => aTree: Tree
       }
       val api = c.Expr(c.typecheck(apiTree))
 
       annottees.map(_.tree) match {
-        case List(q"..$modifiers object $name extends $parent with ..$traits { ..$body }") => {
+        case List(q"..$modifiers object $name extends $parent with ..$traits { ..$body }") =>
 
           val defs = mapMethods(api.actualType, apiTree)
 
@@ -129,11 +127,10 @@ package object macros {
               }
             """
 
-          c.info(c.enclosingPosition, s"Generated $result", false)
+          c.info(c.enclosingPosition, s"Generated $result", force = false)
 
           c.Expr(result)
-        }
-        case mismatch => bail(s"@provideApi can only be applied to object definitions. Encountered unexpected ${mismatch}")
+        case mismatch => bail(s"@provideApi can only be applied to object definitions. Encountered unexpected $mismatch")
       }
     }
 
@@ -167,8 +164,8 @@ package object macros {
           m.returnType
         }
 
-        q"""@inline def ${m.name.toTermName}(..${paramDefs})(implicit ${clientParam.forMethodDefinition}) : ${returnType} = {
-          $apiVar.${m.name}(${clientParam.forMethodInvocation}, ..${paramRefs})
+        q"""@inline def ${m.name.toTermName}(..$paramDefs)(implicit ${clientParam.forMethodDefinition}) : $returnType = {
+          $apiVar.${m.name}(${clientParam.forMethodInvocation}, ..$paramRefs)
         }"""
       }
     }
@@ -198,14 +195,14 @@ package object macros {
 
       lazy val myName = TermName({
         // qualify if multiple
-        if (nameCounters.get(myBaseName).map(_.hasMoreThan1).getOrElse(false)) {
+        if (nameCounters.get(myBaseName).exists(_.hasMoreThan1)) {
           myBaseName + myNum
         } else {
           myBaseName
         }
       })
 
-      def forMethodDefinition = q"${myName} : ${param.typeSignature}"
+      def forMethodDefinition = q"$myName : ${param.typeSignature}"
 
       def forMethodInvocation = {
         val baseClasses = param.typeSignature.baseClasses
@@ -213,9 +210,9 @@ package object macros {
         // make sure (java) repeated types are passed along properly
         if ((baseClasses contains definitions.JavaRepeatedParamClass) ||
           (baseClasses contains definitions.RepeatedParamClass)) {
-          q"${myName} : _*"
+          q"$myName : _*"
         } else {
-          q"${myName}"
+          q"$myName"
         }
       }
     }
@@ -224,7 +221,7 @@ package object macros {
       private var count: Int = 0
 
       def incrementAndGet() = {
-        count += 1;
+        count += 1
         count
       }
 
@@ -241,7 +238,7 @@ trait ApiRequirement[A <: Api[_]] {
   val requiredApi: A
 
   def apply[R](body: this.type => R)(implicit googleApiClient: GoogleApiClient): Option[R] = {
-    (this ifAvailable) map body
+    this.ifAvailable map body
   }
 
   def ifAvailable(implicit googleApiClient: GoogleApiClient): Option[this.type] = {
@@ -264,7 +261,7 @@ trait ApiProvider extends Any {
    * called multiple times).
    */
   implicit protected def pendingResult2Future[O <: Result](pendingResult: PendingResult[O]): Future[O] = {
-    val promise = Promise[O]
+    val promise = Promise[O]()
     pendingResult.setResultCallback(new ResultCallback[O] {
       override def onResult(result: O) = promise success result
     })

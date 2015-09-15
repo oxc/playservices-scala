@@ -17,12 +17,12 @@ package de.esotechnik
 
 import android.app.Activity
 import android.util.Log
-import com.google.android.gms.common.ConnectionResult
 import com.google.android.gms.common.api.Api.ApiOptions.{HasOptions, NotRequiredOptions}
-import com.google.android.gms.common.api.GoogleApiClient.{Builder => ClientBuilder, ConnectionCallbacks, OnConnectionFailedListener}
-import com.google.android.gms.common.api.{Api => PlayApi, Scope, GoogleApiClient}
+import com.google.android.gms.common.api.GoogleApiClient.{ConnectionCallbacks, OnConnectionFailedListener}
+import com.google.android.gms.common.api.{Api => PlayApi, GoogleApiClient, Scope}
 
 import scala.collection.mutable
+import scala.language.implicitConversions
 
 package object playservicesscala {
 
@@ -46,13 +46,11 @@ package object playservicesscala {
           case ApiNoOptions(api, _) => builder.addApi(api)
           case ApiWithOptions(api, options, _) => builder.addApi(api, options())
         }
-        dep.scopes.foreach { builder.addScope(_) }
+        dep.scopes.foreach { builder.addScope }
       }
       apis.optionalApis.foreach {
-        _ match {
-          case ApiNoOptions(api, scopes) => builder.addApiIfAvailable(api, scopes: _*)
-          case ApiWithOptions(api, options, scopes) => builder.addApiIfAvailable(api, options(), scopes: _*)
-        }
+        case ApiNoOptions(api, scopes) => builder.addApiIfAvailable(api, scopes: _*)
+        case ApiWithOptions(api, options, scopes) => builder.addApiIfAvailable(api, options(), scopes: _*)
       }
       apis.frozen = true
 
@@ -80,20 +78,20 @@ package object playservicesscala {
 
     def hasApis = requiredApis.nonEmpty || optionalApis.nonEmpty
 
-    @inline private[this] def requireUnfrozen = require(!frozen, "Cannot add apis after the GoogleApiClient has been built.")
+    @inline private[this] def requireUnfrozen() = require(!frozen, "Cannot add apis after the GoogleApiClient has been built.")
 
     def ++=(xs: TraversableOnce[ApiDependency]) = {
-      requireUnfrozen
+      requireUnfrozen()
       requiredApis ++= xs
     }
 
     def +=(apiDependency: ApiDependency) = {
-      requireUnfrozen
+      requireUnfrozen()
       requiredApis += apiDependency
     }
 
     def ?=(apiDependency: ApiDependency) = {
-      requireUnfrozen
+      requireUnfrozen()
       optionalApis += apiDependency
     }
   }
@@ -121,8 +119,8 @@ package object playservicesscala {
     @inline def %(options: => O) = withOptions(options)
   }
 
-  implicit def apiToDependency[O <: NotRequiredOptions](api: PlayApi[O]) = ApiNoOptions(api, Nil)
-  implicit def requirementToDependency[O <: NotRequiredOptions](apiRequrement: ApiRequirement[PlayApi[O]]) = ApiNoOptions(apiRequrement.requiredApi, Nil)
-  implicit def requirementToRichApi[O <: HasOptions](apiRequirement : ApiRequirement[PlayApi[O]]) = RichApi(apiRequirement.requiredApi)
+  implicit def apiToDependency[O <: NotRequiredOptions](api: PlayApi[O]): ApiNoOptions[O] = ApiNoOptions(api, Nil)
+  implicit def requirementToDependency[O <: NotRequiredOptions](apiRequrement: ApiRequirement[PlayApi[O]]): ApiNoOptions[O] = ApiNoOptions(apiRequrement.requiredApi, Nil)
+  implicit def requirementToRichApi[O <: HasOptions](apiRequirement : ApiRequirement[PlayApi[O]]): RichApi[O] = RichApi(apiRequirement.requiredApi)
 
 }

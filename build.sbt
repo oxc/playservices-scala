@@ -57,7 +57,7 @@ def asSubProject(project : Project) = {
     dependsOn(core).
     settings(
       libraryDependencies ++= Seq(
-        "com.google.android.gms" % s"play-services-${module}" % playServicesVersion.value
+        "com.google.android.gms" % s"play-services-$module" % playServicesVersion.value
       )
     )
 }

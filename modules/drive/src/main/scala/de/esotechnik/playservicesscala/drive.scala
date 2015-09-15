@@ -15,18 +15,18 @@
 
 package de.esotechnik.playservicesscala
 
-import java.{util => ju}
-import java.{lang => jl}
+import java.{lang => jl, util => ju}
 
-import com.google.android.gms.drive.{DriveFolder, DriveFile}
-import com.google.android.gms.drive.metadata.{SortableMetadataField, SearchableCollectionMetadataField, SearchableMetadataField, SearchableOrderedMetadataField}
-import com.google.android.gms.drive.query.{Query => PlayQuery, SortOrder, Filter, Filters}
+import com.google.android.gms.drive.metadata.{SearchableCollectionMetadataField, SearchableMetadataField, SearchableOrderedMetadataField, SortableMetadataField}
 import com.google.android.gms.drive.query.Query.{Builder => QueryBuilder}
 import com.google.android.gms.drive.query.SortOrder.{Builder => SortOrderBuilder}
+import com.google.android.gms.drive.query.{Filter, Filters, Query => PlayQuery, SortOrder}
+import com.google.android.gms.drive.{DriveFile, DriveFolder}
 import com.google.android.gms.{drive => gms}
 import de.esotechnik.playservicesscala.macros.{delegateApi, provideApi, requireApi}
 
 import scala.collection.JavaConversions._
+import scala.language.implicitConversions
 
 package object drive {
 
@@ -50,7 +50,7 @@ package object drive {
 
   @inline def anyOf(filters: Filter*) = Filters.or(filters)
 
-  @inline implicit def not(filter: Filter) = !filter
+  @inline implicit def not(filter: Filter): Filter = !filter
 
   implicit class RichFilter(val filter: Filter) extends AnyVal {
     @inline def and(filters: Filter*) = Filters.and(filter, filters: _*)
@@ -91,7 +91,7 @@ package object drive {
     }
   }
 
-  @inline implicit def isTrue(field: SearchableMetadataField[jl.Boolean]) = field === true
+  @inline implicit def isTrue(field: SearchableMetadataField[jl.Boolean]): Filter = field === true
 
   trait SearchableMetadataFieldOps[T] extends Any {
     val field : SearchableMetadataField[T]

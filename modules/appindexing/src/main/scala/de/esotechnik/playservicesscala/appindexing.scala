@@ -20,6 +20,6 @@ import de.esotechnik.playservicesscala.macros.{provideApi, requireApi}
 
 package object appindexing {
 
-  @provideApi(gms.AppIndex.AppIndexApi) object AppIndex {}
+  @requireApi(gms.AppIndex.API) @provideApi(gms.AppIndex.AppIndexApi) object AppIndex {}
 
 }

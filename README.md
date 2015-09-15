@@ -138,6 +138,10 @@ In Google Play Services, there are two types of API objects:
   original Api, but accepting the `GoogleApiClient` implicitly (which is automatically available if
   you use the `PlayServices` trait on your Activity).
 
+  Some APIs also return types that themselves provide API-like methods that take a
+  `GoogleApiClient`. For those classes, implicitly available API wrappers in form of a value class
+  are available (if I missed one, let me know!).
+
 *NOTE*: For simple APIs, where there is only one object of each type, both are mapped onto a single
 object (for example the AppInvite API). With some versatile APIs on the other hand, each method
 provider has its own required API. They are still grouped into a parent object for consistency (for
@@ -183,7 +187,8 @@ The following module-specific additional APIs are available so far:
 #### Drive ####
 
 For Google Drive queries, the provided implicit conversions allow you to write such queries in a
-much more concise and readable manner:
+much more concise and readable manner. The provided implicit API wrappers for DriveFile/Folder
+make things even easier:
 
 ```scala
 import com.google.android.gms.drive.query.SearchableField._
@@ -191,13 +196,15 @@ import com.google.android.gms.drive.query.{ SortableField => by }
 
 import de.esotechnik.playservicesscala.drive._
 
-val metaData = for {
-  metadataBuffer <- Drive.query(
+val unpinnedMetadata = for {
+  queryResult <- Drive.query(
     TITLE === "Scala is Fun" && IS_PINNED
       sortBy by.TITLE
   )
-  buffer = metadataBuffer.getMetadataBuffer
-} yield buffer.head
+  firstId = queryResult.getMetadataBuffer.head.getDriveId
+  file = Drive.getFile(firstId)
+  metadataResult <- file.updateMetadata(new MetadataChangeSet.Builder().setPinned(false).build())
+} yield metadataResult.getMetadata
 ```
 
 You can also specify the sort order:

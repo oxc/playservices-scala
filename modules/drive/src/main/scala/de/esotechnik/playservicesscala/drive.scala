@@ -18,12 +18,13 @@ package de.esotechnik.playservicesscala
 import java.{util => ju}
 import java.{lang => jl}
 
+import com.google.android.gms.drive.{DriveFolder, DriveFile}
 import com.google.android.gms.drive.metadata.{SortableMetadataField, SearchableCollectionMetadataField, SearchableMetadataField, SearchableOrderedMetadataField}
 import com.google.android.gms.drive.query.{Query => PlayQuery, SortOrder, Filter, Filters}
 import com.google.android.gms.drive.query.Query.{Builder => QueryBuilder}
 import com.google.android.gms.drive.query.SortOrder.{Builder => SortOrderBuilder}
 import com.google.android.gms.{drive => gms}
-import de.esotechnik.playservicesscala.macros.{provideApi, requireApi}
+import de.esotechnik.playservicesscala.macros.{delegateApi, provideApi, requireApi}
 
 import scala.collection.JavaConversions._
 
@@ -34,6 +35,12 @@ package object drive {
     @provideApi(gms.Drive.DrivePreferencesApi) object Preferences {}
   }
 
+
+  implicit class RichDriveFile(@delegateApi val driveFile: DriveFile) extends AnyVal {
+  }
+
+  implicit class RichDriveFolder(@delegateApi val driveFolder: DriveFolder) extends AnyVal {
+  }
 
   /**************
    * Filter api *

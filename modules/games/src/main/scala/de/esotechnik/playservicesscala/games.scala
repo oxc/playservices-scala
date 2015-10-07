@@ -46,6 +46,7 @@ package object games {
     @provideApi(gms.Games.RealTimeMultiplayer) object RealTimeMultiplayer {}
     @provideApi(gms.Games.Requests) object Requests {}
     @provideApi(gms.Games.Snapshots) object Snapshots {}
+    @provideApi(gms.Games.Stats) object Stats {}
     @provideApi(gms.Games.TurnBasedMultiplayer) object TurnBasedMultiplayer {}
 
   }

@@ -1,7 +1,7 @@
 import Build._
 
 libraryVersion in ThisBuild := "0.1.3"
-playServicesVersion in ThisBuild := "7.8.0"
+playServicesVersion in ThisBuild := "8.1.0"
 isSnapshot := true
 
 scalaVersion in ThisBuild := "2.11.7"
@@ -36,7 +36,6 @@ def commonSettings(project : Project) = {
       bintrayPackage := packageName,
 
       libraryProject in Android := true,
-      transitiveAndroidLibs in Android := false,
 
       platformTarget in Android := "android-23",
       minSdkVersion in Android := "4",

@@ -2,7 +2,7 @@ import Build._
 
 libraryVersion in ThisBuild := "0.1.3"
 playServicesVersion in ThisBuild := "8.1.0"
-isSnapshot := true
+isSnapshot := false
 
 scalaVersion in ThisBuild := "2.11.7"
 

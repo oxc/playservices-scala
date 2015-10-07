@@ -241,9 +241,9 @@ resolvers ++= Seq(
 libraryDependencies ++= Seq(
   ...
   aar("com.google.android.gms" % "play-services-maps" % "7.8.0"),
-  "de.esotechnik" %% "playservices-scala-maps" % "0.1.2-gms_7.8.0",
+  "de.esotechnik" %% "playservices-scala-maps" % "0.1.3-gms_7.8.0",
   aar("com.google.android.gms" % "play-services-location" % "7.8.0"),
-  "de.esotechnik" %% "playservices-scala-location" % "0.1.2-gms_7.8.0",
+  "de.esotechnik" %% "playservices-scala-location" % "0.1.3-gms_7.8.0",
   ...
 )
 
